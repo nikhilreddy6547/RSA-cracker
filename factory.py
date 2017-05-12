@@ -12,3 +12,4 @@ from legendre import *
 from Shanks import *
 from Gauss import *
 from sparse import *
+from random import *

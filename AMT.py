@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat May 06 16:02:39 2017
 
-@author: Nikhil Reddy
+#@author: AMT
 """
 import factory as f
 
@@ -39,13 +38,50 @@ def factor(num, bound, m):
             factors[j][-1] = (factors[j][-1] + 1) % 2
         else:
             j = j - fb[-1]
-    print(Q)
+    #print(Q)
     filtered = []
+    xi = []
     for i in range(len(factors)):
         if Q[i] == 1:
-            print(i)
+            #print(i)
             filtered.append(factors[i])
-    print(filtered)
+            xi.append(i - m)
+    #print(filtered)
     if len(filtered) <= len(fb):
         print("m is too small")
-        #return factor(num, bound, 2 * m)
+        return factor(num, bound, 2 * m)
+    else:
+        for i in range(len(filtered)):
+            tup = [(filtered[w], xi[w]) for w in range(len(xi))]
+            tup = f.sample(tup[:i] + tup[(i + 1):], len(fb))
+            try:
+                #print(len([v[0] for v in tup]))
+                #print(len([v[0] for v in tup][0]))
+                #print(len(filtered[i]))
+                y = f.sparse([v[0] for v in tup], filtered[i])
+                x = f.array([v[0] for v in tup])
+                #print(x.shape, y.shape)
+                if f.array_equal(f.dot(x, y), filtered[i]):
+                    prod = 1
+                    qprod = 1
+                    truexi = [v[1] for v in tup]
+                    for i in range(len(truexi)):
+                        prod *= y[i][0] * truexi[i]
+                        qprod *= y[i][0] * (truexi[i] * truexi[i] - num)
+                    gcd1 = f.abs(f.gcd(qprod - prod, num))
+                    gcd2 = f.abs(f.gcd(qprod + prod, num))
+                    if gcd1 != 1:
+                        result.extend(factor(gcd1, bound, m))
+                        result.extend(factor(num / gcd1, bound, m))
+                        return result
+                    if gcd2 != 1:
+                        result.extend(factor(gcd2, bound, m))
+                        result.extend(factor(num / gcd2, bound, m))
+                        return result
+            except KeyboardInterrupt:
+                raise
+            except Exception as e:
+                print(e)
+                continue
+    print("did not work, trying again")        
+    factor(num, bound, 2 * m)
