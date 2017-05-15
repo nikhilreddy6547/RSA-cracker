@@ -46,7 +46,7 @@ def factor(num, bound, m):
             #print(i)
             filtered.append(factors[i])
             xi.append(i - m)
-    #print(filtered)
+    print(filtered)
     if len(filtered) <= len(fb):
         print("m is too small")
         return factor(num, bound, 2 * m)
@@ -63,13 +63,19 @@ def factor(num, bound, m):
                 #print(x.shape, y.shape)
                 if f.array_equal(f.dot(x, y), filtered[i]):
                     prod = 1
-                    qprod = 1
+                    qprod = f.array([0] * len(fb))
                     truexi = [v[1] for v in tup]
+                    b = [v[0] for v in tup]
                     for i in range(len(truexi)):
-                        prod *= y[i][0] * truexi[i]
-                        qprod *= y[i][0] * (truexi[i] * truexi[i] - num)
-                    gcd1 = f.abs(f.gcd(qprod - prod, num))
-                    gcd2 = f.abs(f.gcd(qprod + prod, num))
+                        prod *= (y[i][0] * truexi[i]) if y[i][0] else 1
+                        qprod += y[i][0] * b[i]
+                    qprod /= 2
+                    iu = 1
+                    print("Works")
+                    for i in range(len(qprod)):
+                        iu *= fb[i] ** qprod[i]
+                    gcd1 = f.abs(f.gcd(iu - prod, num))
+                    gcd2 = f.abs(f.gcd(iu + prod, num))
                     if gcd1 != 1:
                         result.extend(factor(gcd1, bound, m))
                         result.extend(factor(num / gcd1, bound, m))
