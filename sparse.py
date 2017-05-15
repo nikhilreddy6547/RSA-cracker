@@ -4,8 +4,6 @@ import numpy as np
 import bm
 
 def sparse(matrix, vector):
-    matrix = np.array(matrix).T
-    vector = np.array([vector]).T
     func = matrix.dot
     n = len(matrix)
     powers = [vector]
@@ -36,8 +34,7 @@ def sparse(matrix, vector):
         #print(g.order)
         #print(g(matrix))
         k += 1
-    x = [g(i + 1) * powers[i] % 2 for i in range(g.order)]
-    #print(x)
-    x = -sum(x)
-    x = np.array([i % 2 for i in x])
-    return(x)
+    result = np.array([[0]] * n)
+    for i in range(g.order):
+        result += g(i + 1) * powers[i]
+    return(result % 2)
